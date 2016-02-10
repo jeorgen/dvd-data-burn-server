@@ -1,0 +1,22 @@
+# Example config file. Copy this file and remove ".example" 
+# from the copy's file name to use it as a config file
+[LOCATIONS]
+# Where the backed up files reside that you want to transfer
+SRC_DIR = /path/to/your/backup/source_directory
+# The directory that the burn server is watching
+SESSION_BASE_PARENT_DIR = /path/to/your/destination_directory
+
+[SESSION FREQUENCY]
+# Maximum time between sessions, if at least one new/changed file
+MINUTES_BETWEEN_SESSIONS = 30
+# If this many files pile up, you want an immediate session
+FILE_COUNT_FOR_IMMEDIATE_SESSION = 50
+
+[ADVANCED]
+# How often the server checks for new files, in seconds
+POLLING_INTERVAL_IN_SECS = 5
+
+# Use 'which find' to find out the full path to
+# the find command
+FIND_COMMAND_LOCATION = /usr/bin/find
+

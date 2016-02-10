@@ -1,0 +1,11 @@
+# Example config file. Copy this file and remove ".example" 
+# from the copy's file name to use it as a config file
+[DIRECTORIES]
+# Top folder where transfers turn up
+WATCHED_FOLDER = /path to/backup/watched_folder
+
+[BURNER]
+# Where the DVD burner you want to use is in the device tree
+BURNER_LOCATION = /dev/dvdrw
+# Full path to the xorriso executable
+XORRISO_LOCATION = /usr/bin/xorriso
