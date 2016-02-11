@@ -78,7 +78,7 @@ def mark_as_burned(path):
     for afile in  get_top_level_files(path):
         os.unlink(os.path.join(path, afile))
     # name the dir as burned
-    shutil.move(path, path + '-burned')
+    shutil.move(path, path + '-burned-' + utils.unique_in_time())
 
 if __name__ == '__main__':
     while True: #Watch loop
