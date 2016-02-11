@@ -1,4 +1,8 @@
 import sys
+import datetime
+
+def unique_in_time():
+    return str(datetime.today()).replace(':','-').replace(' ','-')
 
 def missing_or_bad_config(e, attempted_file, example_file):
     sys.stderr.write( """
