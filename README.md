@@ -46,7 +46,7 @@ Directories and files below can have any names you like
 
 If you are using DVD+R, you can burn 153 sessions before it's time to switch in a new disk. For DVD-R it is 99 sessions.
 
-After burning, the server removes the _time to burn_  file and the session directory gets "-burned" appended to its name
+After burning, the server removes the _time to burn_  file and the session directory gets "-burned" and a time stamp appended to its name
 
 An example, burning the files of ```my_files_dir``` via rsync:
 
