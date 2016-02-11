@@ -43,9 +43,11 @@ def get_burn_candidates():
     candidates =  [directory for directory in get_directories(WATCHED_FOLDER) if dir_ready(directory)]
     return candidates
 
-def burn(subdir):
+def burn(subdir, testing = False):
     print "burning with" 
     command = BURN_COMMAND + [subdir]
+    if testing:
+        return command
     status = subprocess.check_call(command)
     print "burned"
     # TODO: Check if it fails, why. If disk is full, then operator

@@ -1,32 +1,70 @@
 #!/usr/bin/env python
-import unittest
-import traceback
-import os
-import signal
-import subprocess
-import tempfile
-import time
-import shutil
-import inspect
-import logging
-import time
-from  utils import ModuleAttributesContextManager
-import session_server as ts
 
-def unique_in_time():
-    return str(datetime.today()).replace(':','-').replace(' ','-')
+import unittest
+import os
+import tempfile
+import shutil
+from  utils import ModuleAttributesContextManager, unique_in_time
+import session_server as ts
+import burn_server as bs
 
 def create_tree(base_dir, structure):
     paths_created = []
     for path in structure:
         long_path = os.path.join(base_dir, path)
         paths_created.append(long_path)
-        print "path is '%s'" % long_path
         ts.make_file_path(long_path)
         with open(long_path, 'w') as fo:
             fo.write('foo')
     return paths_created
 
+class TestBurnServer(unittest.TestCase):
+
+    def setUp(self):
+        bs.WATCHED_FOLDER = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(bs.WATCHED_FOLDER)
+
+    def test_get_top_level_files(self):
+        """Check that the number of top level files are correct"""
+        base_dir = tempfile.mkdtemp()
+        test_files = ['foo','bar','baz']
+        create_tree(base_dir, test_files)
+        files = bs.get_top_level_files(base_dir)
+        self.assertEqual(len(files), len(test_files))
+        shutil.rmtree(base_dir)
+
+    def test_get_directories(self):
+        """Check that the number of top level directories are correct"""
+        test_paths = ['foo/bar','bar/bar','baz/bar']
+        create_tree(bs.WATCHED_FOLDER, test_paths)
+        paths = bs.get_directories(bs.WATCHED_FOLDER)
+        self.assertEqual(len(paths), len(test_paths))
+
+    def test_dir_ready(self):
+        """Check if there is a burn file"""
+        create_tree(bs.WATCHED_FOLDER, ['data_dir/data','burn_file'])
+        self.assertTrue(bs.dir_ready(bs.WATCHED_FOLDER))
+
+    def test_dir_not_ready(self):
+        """Check that there is not a burn file"""
+        create_tree(bs.WATCHED_FOLDER, ['data_dir/data',])
+        self.assertFalse(bs.dir_ready(bs.WATCHED_FOLDER))
+
+    def test_get_burn_candidates(self):
+        """Check and see how many burn candidate there are"""
+        create_tree(bs.WATCHED_FOLDER, ['session1/data/foo', 'session1/burn_signal]', 'session2/data/foo'])
+        self.assertTrue(len(bs.get_burn_candidates())== 1)
+
+    def test_burn(self):
+        """ Check if 'xorriso' is in the resulting command"""
+        res = bs.burn(bs.WATCHED_FOLDER, testing = True)
+        self.assertTrue('xorriso' in res[0])
+
+    def test_get_sub_directory(self):
+        create_tree(bs.WATCHED_FOLDER, ['foo/bar',])
+        assert (bs.get_sub_directory(bs.WATCHED_FOLDER).endswith ('/foo'))
 
 class TestSessionServer(unittest.TestCase):
 
@@ -56,7 +94,6 @@ class TestSessionServer(unittest.TestCase):
             files = ()
             self.assertFalse(ts.enough(files))
 
-
     def test_compute_now_in_minutes(self):
         self.assertEqual(type(ts.compute_now_in_minutes()), type(4))
 
@@ -76,7 +113,6 @@ class TestSessionServer(unittest.TestCase):
     def test_get_new_files(self):
         structure = [ 'foo/bar/baz.txt', 'foo/bar/baz2.txt','foo/blurt.txt', 'foo/bletch/flum.txt']
         create_tree(ts.SRC_DIR, structure)
-        # new_files = subprocess.check_call(ts.FIND_ALL_COMMAND)
         files_list = ts.get_new_files(ts.FIND_ALL_COMMAND)
         self.assertTrue(len(files_list) == len(structure))
 
